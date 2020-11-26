@@ -14,7 +14,7 @@ face_mesh = mp_face_mesh.FaceMesh(
 drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
 #### Added ####
-f1 = "D:/Desktop_D/face1.jpg"
+# f1 = "D:/Desktop_D/face1.jpg"
 # f2 = "D:/Desktop_D/face2.jpg"
 # f3 = "D:/Desktop_D/face3.jpg"
 # f4 = "D:/Desktop_D/HCI_Project/archive/train/happy/Training_10019449.jpg"
