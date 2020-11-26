@@ -25,6 +25,7 @@ f1_test_list = file_path_generator(f1_test_path)
 f2_train_list = file_path_generator(f2_train_path)
 f2_test_list = file_path_generator(f2_test_path)
 
+
 # Return value: list of [train list, test list, label]
 file_list = [[f1_train_list, f1_test_list, f1_label],\
     [f2_train_list, f2_test_list, f2_label]]
