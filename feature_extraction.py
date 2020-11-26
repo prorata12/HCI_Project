@@ -1,86 +1,100 @@
-# https://google.github.io/mediapipe/solutions/face_mesh.html
 import cv2
 import mediapipe as mp
 import numpy as np #Added
 import file_read as fr #Added
-mp_drawing = mp.solutions.drawing_utils
-mp_face_mesh = mp.solutions.face_mesh
+import copy
 
-# For static images:
-face_mesh = mp_face_mesh.FaceMesh(
-    static_image_mode=True,
-    max_num_faces=1,
-    min_detection_confidence=0.5)
-drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+# Link : https://google.github.io/mediapipe/solutions/face_mesh
 
-#### Added ####
-# f1 = "D:/Desktop_D/face1.jpg"
-# f2 = "D:/Desktop_D/face2.jpg"
-# f3 = "D:/Desktop_D/face3.jpg"
-# f4 = "D:/Desktop_D/HCI_Project/archive/train/happy/Training_10019449.jpg"
-# file_list = [f1,f2,f3,f4]
-file_list = fr.file_list[0][0]
-print(file_list)
-#### Added end ####
 
-for idx, file in enumerate(file_list):
-  print(file)
-  image = cv2.imread(file)
+def one_folder_landmarking(folder):
 
-  #### Added ####
-  x_size = len(image[0])
-  y_size = len(image)
-  print(len(image))
-  #image = cv2.line(image,(x_size,y_size),(150,150),(0,0,255),2)
-  cv2.imshow("Original",image)
-  cv2.waitKey(0)
-  #### Added End ####
+  for idx, file in enumerate(folder):
+    # in folder, process pictures one by one
+    # idx :  picture index
+    # file : path of image file)
+    
+    print("Picture Path: ",file)
+    image = cv2.imread(file)
 
-  # Convert the BGR image to RGB before processing.
-
-  results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-
-  # Print and draw face mesh landmarks on the image.
-  if not results.multi_face_landmarks:
-    continue
-  annotated_image = image.copy()
-
-  #### Added ####
-  x_pos = np.zeros((len(file_list),468))
-  y_pos = np.zeros((len(file_list),468))
-  z_pos = np.zeros((len(file_list),468))
-  #### Added End ####
-  
-  for pic_num, face_landmarks in enumerate(results.multi_face_landmarks): #Modified
-    mp_drawing.draw_landmarks(
-        image=annotated_image,
-        landmark_list=face_landmarks,
-        connections=mp_face_mesh.FACE_CONNECTIONS,
-        landmark_drawing_spec=drawing_spec,
-        connection_drawing_spec=drawing_spec)
-    #### Added ####
-    print("Landmarks",face_landmarks.landmark[0],"End")
-    print("Landmarks",len(face_landmarks.landmark),"End") # 468 Landmarks
-    # print("Landmarks",face_landmarks.landmark[0].x,"End")
-    # print("Landmarks",face_landmarks.landmark[0].y,"End")
-    # print("Landmarks",face_landmarks.landmark[0].z,"End")
-
-    for index,landmark in enumerate(face_landmarks.landmark):
-      x_pos[idx][index] = landmark.x
-      y_pos[idx][index] = landmark.y
-      z_pos[idx][index] = landmark.z
-    #### Added End ####
-
-    #### Added ####
-    cv2.imshow("Annotated",annotated_image)
+    cv2.imshow("Original",image)
     cv2.waitKey(0)
-    #cv2.imwrite('./original_image' + str(idx) + '.png', image)
-    #cv2.imwrite('./annotated_image' + str(idx) + '.png', annotated_image)
-    #### Added End ####
-face_mesh.close()
+
+    # Convert the BGR image to RGB before processing.
+    results = face_mesh.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+    # Print and draw face mesh landmarks on the image.
+    if not results.multi_face_landmarks:
+      continue
+    annotated_image = image.copy()
+
+    # 468 : number of facial landmarks in MediaPipe
+    x_pos = np.zeros((len(folder),468))
+    y_pos = np.zeros((len(folder),468))
+    z_pos = np.zeros((len(folder),468))
+    
+    for face_landmarks in results.multi_face_landmarks:
+      mp_drawing.draw_landmarks(
+          image=annotated_image,
+          landmark_list=face_landmarks,
+          connections=mp_face_mesh.FACE_CONNECTIONS,
+          landmark_drawing_spec=drawing_spec,
+          connection_drawing_spec=drawing_spec)
+
+      print("Landmark (first sample)\n",face_landmarks.landmark[0])
+      print("Number of Landmarks:",len(face_landmarks.landmark)) # 468 Landmarks
+
+      for index,landmark in enumerate(face_landmarks.landmark):
+        x_pos[idx][index] = landmark.x
+        y_pos[idx][index] = landmark.y
+        z_pos[idx][index] = landmark.z
+
+
+      cv2.imshow("Annotated",annotated_image)
+      cv2.waitKey(0)
+
+      # You can save images using this
+      #cv2.imwrite('./original_image' + str(idx) + '.png', image)
+      #cv2.imwrite('./annotated_image' + str(idx) + '.png', annotated_image)
+
+  face_mesh.close()
+  x_pos[idx][index] = landmark.x
+  y_pos[idx][index] = landmark.y
+  z_pos[idx][index] = landmark.z
+  return x_pos, y_pos, z_pos
 
 
 
+
+if __name__ == "__main__":
+
+  mp_drawing = mp.solutions.drawing_utils
+  mp_face_mesh = mp.solutions.face_mesh
+
+  # For static images:
+  face_mesh = mp_face_mesh.FaceMesh(
+      static_image_mode=True,
+      max_num_faces=1,
+      min_detection_confidence=0.5)
+  drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+
+
+
+  file_list = copy.deepcopy(fr.file_list)  # [emotion][0: train, 1: test, 2:label]
+
+  one_folder_landmarking(file_list[0][0])
+  one_folder_landmarking(file_list[0][1])
+  # file_list[0][2] stores 0 (emotion label of pictures)
+
+  one_folder_landmarking(file_list[1][0])
+  one_folder_landmarking(file_list[1][1])
+  # file_list[1][2] stores 1 (emotion label of pictures)
+
+
+
+
+# =================================================================================================== #
+# webcam is not tested yet. This code is raw version from mediapipe site.
 
 # For webcam input:
 face_mesh = mp_face_mesh.FaceMesh(
@@ -117,11 +131,3 @@ while cap.isOpened():
 face_mesh.close()
 cap.release()
 
-
-####
-#ML PART
-####
-
-x_pos[idx][index] = landmark.x
-y_pos[idx][index] = landmark.y
-z_pos[idx][index] = landmark.z
