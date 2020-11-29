@@ -79,8 +79,8 @@ def one_folder_landmarking(folder,index):
     y_pos.append(y_pos_one_picture)
     z_pos.append(z_pos_one_picture)
 
-    cv2.imwrite(original_path + str(idx) + '.png', image)
-    cv2.imwrite(annotated_path + str(idx) + '.png', annotated_image)
+    #cv2.imwrite(original_path + str(idx) + '.png', image)
+    #cv2.imwrite(annotated_path + str(idx) + '.png', annotated_image)
   face_mesh.close()
 
   print('errorcount = ',errorcount)
@@ -112,11 +112,11 @@ if __name__ == "__main__":
     z_pos_train[idx] = copy.deepcopy(z)
   
   for idx,folder in enumerate(fr.test_pictures):
-    print('train folder num=',idx)
+    print('test folder num=',idx)
     x,y,z = one_folder_landmarking(folder,idx)
-    x_pos_text[idx] = copy.deepcopy(x)
-    y_pos_text[idx] = copy.deepcopy(y)
-    z_pos_text[idx] = copy.deepcopy(z)
+    x_pos_test[idx] = copy.deepcopy(x)
+    y_pos_test[idx] = copy.deepcopy(y)
+    z_pos_test[idx] = copy.deepcopy(z)
   
   x_pos_train = np.array(x_pos_train)
   y_pos_train = np.array(y_pos_train)
@@ -134,7 +134,7 @@ if __name__ == "__main__":
   np.save('D:/Desktop_D/HCI_Project/z_pos_test',z_pos_test)
 
 
-
+"""
 # =================================================================================================== #
 # webcam is not tested yet. This code is raw version from mediapipe site.
 
@@ -173,3 +173,4 @@ while cap.isOpened():
 face_mesh.close()
 cap.release()
 
+"""
